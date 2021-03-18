@@ -1,24 +1,24 @@
 import React, { useEffect } from "react";
 import moment from "moment";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {
-  Box,
-  Button,
-  Card,
-  CardHeader,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Tooltip,
-  makeStyles,
-  Typography,
-  Collapse,
-  IconButton,
-} from "@material-ui/core";
+import makeStyles from "@material-ui/styles/makeStyles";
+import Box from "@material-ui/core/Box";
+import Card from "@material-ui/core/Card";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Button from "@material-ui/core/Button";
+import CardHeader from "@material-ui/core/CardHeader";
+import Divider from "@material-ui/core/Divider";
+import Tooltip from "@material-ui/core/Tooltip";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import IconButton from "@material-ui/core/IconButton";
+import Collapse from "@material-ui/core/Collapse";
+import Typography from "@material-ui/core/Typography";
+
+
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";

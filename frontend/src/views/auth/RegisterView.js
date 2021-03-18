@@ -1,9 +1,7 @@
 import React, { useRef } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Formik } from "formik";
-import {
-  makeStyles,
-} from "@material-ui/core";
+import makeStyles from "@material-ui/styles/makeStyles";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";

@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState }  from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  Grid,
-  TextField,
-} from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
+import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+
 import { addBranch, getTimezones, hideAlert, getCurrencies, initiateBranchAdd, setBranch as setBranchInState } from '../../actions';
 import { Formik } from 'formik';
 import { remoteValidate } from '../../modules/helpers';
@@ -41,30 +40,15 @@ const AddBranch = () => {
     "^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{5,})"
   );
 
-  useEffect(()=>{
     const selectedBranch = branchState.selectedBranch;
     if(selectedBranch){
-      setBranch({...selectedBranch ,newUserName:selectedBranch.userName})
-
+     setBranch({...selectedBranch ,newUserName:selectedBranch.userName})
+    }else{
+      !branch.newUserName && setBranch({...branch ,newUserName:user.user.name.split(" ").join("")+"-"})
     }
-  },[branchState.selectedBranch])
-
-  useEffect(()=>{
-    if(!branchState.selectedBranch){
-      setBranch({...branch ,newUserName:user.user.name.split(" ").join("")+"-"})
-    }
-  },[user])
-  useEffect(()=>{
-    if(!branchState.selectedBranch){
-      setBranch({...branch ,tz:Intl.DateTimeFormat().resolvedOptions().timeZone})
-    }
-  },[appState.tzs])
-  useEffect(()=>{
-    if(!branchState.selectedBranch){
-      setBranch({...branch ,newUserName:user.user.name.split(" ").join("")+"-"})
-    }
- 
-  },[user])
+    if(appState.tzs){
+      !branch.tz && setBranch({...branch ,tz:Intl.DateTimeFormat().resolvedOptions().timeZone})
+  }
 
   if (appState.alert.show) {
     Toast({ message: appState.alert.message });
@@ -119,7 +103,7 @@ const AddBranch = () => {
 
   const back = ()=>{
     dispatch(initiateBranchAdd(false))
-    dispatch(setBranchInState({}))
+    dispatch(setBranchInState(null))
   }
   
   const validate = async (values) => {

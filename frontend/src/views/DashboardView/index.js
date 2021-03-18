@@ -1,5 +1,8 @@
-import React from "react";
-import { Container, Grid, makeStyles } from "@material-ui/core";
+import React, { useMemo } from "react";
+import makeStyles from "@material-ui/styles/makeStyles";
+import  Container from "@material-ui/core/Container";
+import  Grid from "@material-ui/core/Grid";
+
 import Page from "../../components/Page";
 import LatestOrders from "./LatestOrders";
 import Orders from "./Orders";
@@ -19,8 +22,8 @@ const useStyles = makeStyles((theme) => ({
 const Dashboard = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-
-  dispatch(getDashboardStats())
+  useMemo(()=>{dispatch(getDashboardStats())}, [dispatch])
+  
   return (
     <Page className={classes.root} title="Dashboard">
       <Container maxWidth={false}>

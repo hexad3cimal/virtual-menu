@@ -1,22 +1,21 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {
-  Box,
-  Card,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
-  makeStyles,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-  Button,
-} from "@material-ui/core";
+import makeStyles from "@material-ui/styles/makeStyles";
+import Box from "@material-ui/core/Box";
+import Card from "@material-ui/core/Card";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableRow from "@material-ui/core/TableRow";
+import CardContent from "@material-ui/core/CardContent";
+import TextField from "@material-ui/core/TextField";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import SvgIcon from "@material-ui/core/SvgIcon";
+import Button from "@material-ui/core/Button";
+
 import { Search as SearchIcon } from "react-feather";
 import { useDispatch } from "react-redux";
 import { deleteBranch, getBranches, hideAlert, initiateBranchAdd, setBranch } from "../../actions";

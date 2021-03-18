@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import {
-  makeStyles
-} from '@material-ui/core';
+import makeStyles from "@material-ui/styles/makeStyles";
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
@@ -64,7 +62,6 @@ const LoginView = () => {
     Toast({ message: appState.alert.message });
     dispatch(hideAlert());
   }
-  useEffect(()=>{
     if (user.isAuthenticated) {
       if(user.user.role === 'table'){
         navigate('/table', { replace: true });
@@ -76,8 +73,7 @@ const LoginView = () => {
       }
       navigate('/app/dashboard', { replace: true });
     }
-  },[user.isAuthenticated])
- 
+
   return (
     <Page className={classes.root} title="Login">
       <Box className={classes.box}>

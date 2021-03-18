@@ -1,31 +1,27 @@
 import React from 'react';
-import {
-  Avatar,
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-  colors,
-  makeStyles
-} from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import MoneyIcon from '@material-ui/icons/Money';
+import Box from "@material-ui/core/Box";
+import Avatar from "@material-ui/core/Avatar";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import makeStyles from "@material-ui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100%'
   },
   avatar: {
-    backgroundColor: colors.red[600],
     height: 56,
     width: 56
   },
   differenceIcon: {
-    color: colors.red[900]
+    color: 'red'
   },
   differenceValue: {
-    color: colors.red[900],
+    color: 'red',
     marginRight: theme.spacing(1)
   }
 }));

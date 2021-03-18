@@ -1,14 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 
-import {
-  Box,
-  Button,
-} from '@material-ui/core';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+
 import {initiateBranchAdd} from '../../actions';
 
-const Toolbar = ({ className, ...rest }) => {
+const Toolbar = () => {
   const dispatch = useDispatch();
 
   return (
@@ -19,10 +17,6 @@ const Toolbar = ({ className, ...rest }) => {
       </Box>
 
   );
-};
-
-Toolbar.propTypes = {
-  className: PropTypes.string,
 };
 
 export default Toolbar;

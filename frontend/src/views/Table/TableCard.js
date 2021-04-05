@@ -16,6 +16,8 @@ import { selectedTable, editTable, deleteTable } from "../../actions/";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { Bounce } from "react-awesome-reveal";
+import QRCode  from "qrcode.react";
+
 import AddTable from "./AddTable";
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,6 +90,7 @@ const TableCard = ({ table }) => {
               <Typography align="center" color="textPrimary" variant="body1">
                 {table.loginCode}
               </Typography>
+              <QRCode value={`${window.location.hostname}/table/${table.loginCode}`} />,
             </Grid>
           </Box>
           <Divider />

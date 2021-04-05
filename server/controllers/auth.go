@@ -27,6 +27,8 @@ func (ctl AuthController) IstokenValid(c *gin.Context) {
 			tokenModel.UserId = loggedInUser.ID
 			tokenModel.OrgId = loggedInUser.OrgId
 			tokenModel.RoleId = loggedInUser.RoleId
+			tokenModel.TimeZone = loggedInUser.Config.TimeZone
+			tokenModel.Currency = loggedInUser.Config.Currency
 			tokenModel.AccessToken = tokenDetails.AccessToken
 			tokenModel.RefreshToken = tokenDetails.RefreshToken
 			tokenModel.ID = tokenDetails.AccessUUID
@@ -101,6 +103,8 @@ func (ctl AuthController) Refresh(c *gin.Context) {
 	tokenModel.UserId = oldTokenModel.UserId
 	tokenModel.OrgId = oldTokenModel.OrgId
 	tokenModel.RoleId = oldTokenModel.RoleId
+	tokenModel.TimeZone = oldTokenModel.TimeZone
+	tokenModel.Currency = oldTokenModel.Currency
 	tokenModel.AccessToken = tokenDetails.AccessToken
 	tokenModel.RefreshToken = tokenDetails.RefreshToken
 	tokenModel.ID = tokenDetails.AccessUUID

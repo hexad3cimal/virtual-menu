@@ -20,6 +20,7 @@ type ProductModel struct {
 	Discount       int                   `db:"discount" json:"discount"`
 	Description    string                `db:"description" json:"description"`
 	Image          string                `db:"image" json:"image"`
+	Currency       string                `db:"currency" json:"currency"`
 	Highlight      bool                  `db:"highlight" json:"highlight"`
 	Active         bool                  `db:"active" json:"active" sql:"DEFAULT:true"`
 	UpdatedAt      time.Time             `db:"updated_at" json:"-" sql:"DEFAULT:current_timestamp"`

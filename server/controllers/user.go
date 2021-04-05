@@ -4,7 +4,9 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"table-booking/helpers"
 	"table-booking/mappers"
+	"table-booking/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -59,6 +61,8 @@ func (ctrl UserController) Login(c *gin.Context) {
 		tokenModel.OrgId = loggedInUser.OrgId
 		tokenModel.RoleId = loggedInUser.RoleId
 		tokenModel.AccessToken = tokenDetails.AccessToken
+		tokenModel.TimeZone = loggedInUser.Config.TimeZone
+		tokenModel.Currency = loggedInUser.Config.Currency
 		tokenModel.RefreshToken = tokenDetails.RefreshToken
 		tokenModel.ID = tokenDetails.AccessUUID
 		tokenModel.Valid = true
@@ -70,6 +74,15 @@ func (ctrl UserController) Login(c *gin.Context) {
 			if loggedInUser.FirstLogin {
 				firstLogin = true
 			}
+			loggedInUser.FirstLogin = false
+
+			_, userUpdateError := user.Register(loggedInUser)
+			if userUpdateError != nil {
+				logger.Error("Login status update failed ", userUpdateError)
+				c.JSON(http.StatusNotAcceptable, gin.H{"message": "Invalid login details", "error": "error"})
+				c.Abort()
+				return
+			}
 			c.SetCookie("token", tokenDetails.AccessToken, 60*60*23, "/", "localhost", false, true)
 			c.SetCookie("refresh-token", tokenDetails.RefreshToken, 60*60*24, "/", "localhost", false, true)
 			c.JSON(http.StatusOK, gin.H{"message": "User signed in", "name": loggedInUser.Name,
@@ -80,7 +93,7 @@ func (ctrl UserController) Login(c *gin.Context) {
 		}
 
 		logger.Error(" login failed for " + loginForm.UserName)
-		c.JSON(http.StatusNotAcceptable, gin.H{"message": "Invalid login details", "error": tokenAddError.Error()})
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": "Invalid login details"})
 		c.Abort()
 		return
 	}
@@ -212,7 +225,32 @@ func (ctrl UserController) Update(c *gin.Context) {
 		return
 	}
 
-	userModel, getUserError := user.GetUserById(tokenModel.UserId)
+	var userModel models.UserModel
+	var getUserError error
+
+	id, gotEdit := c.GetQuery("id")
+	if gotEdit {
+		var isUnauthorized = false
+		userModel, getUserError = user.GetUserById(id)
+		if helpers.IsAdmin(c.GetHeader("access_uuid")) {
+			if userModel.OrgId != tokenModel.OrgId {
+				isUnauthorized = true
+
+			}
+		} else if userModel.BranchId != tokenModel.BranchId {
+			isUnauthorized = true
+		}
+		if isUnauthorized {
+			logger.Error("unauthorized edit by user ", tokenModel.UserId)
+			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+			c.Abort()
+			return
+		}
+
+	} else {
+		userModel, getUserError = user.GetUserById(tokenModel.UserId)
+
+	}
 
 	if getUserError != nil {
 		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})

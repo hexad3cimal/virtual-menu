@@ -45,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     display: "flex",
     flexDirection: "column",
+    margin:'1rem'
   },
   price: {
     color: theme.palette.text.primary,
@@ -133,7 +134,7 @@ const TableView = () => {
                       </Typography>
                       <Box className={classes.detailsBox}>
                       <Typography className={classes.price}>
-                        Rs {order.price}
+                        {order.currency} {order.price}
                       </Typography>
                       <Typography className={classes.quantity}>
                         {order.quantity} Nos
@@ -177,7 +178,7 @@ const TableView = () => {
                                         {item.name}
                                       </TableCell>
                                       <TableCell align="right">
-                                        {item.price}
+                                      {item.currency} {item.price}
                                       </TableCell>
                                     </TableRow>
                                   ))

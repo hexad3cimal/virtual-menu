@@ -46,7 +46,7 @@ export function* addTable({ payload }) {
  */
 export function* editTable({ payload }) {
   try {
-    yield request(`${window.restAppConfig.api}table`, {
+    yield request(`${window.restAppConfig.api}table?id=${payload.id}`, {
       method: "PUT",
       payload,
     });

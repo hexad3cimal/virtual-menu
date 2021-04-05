@@ -15,6 +15,7 @@ type OrderModel struct {
 	Price      float32          `db:"price" json:"price"`
 	Note       string           `db:"note" json:"note"`
 	Status     string           `db:"status" json:"status"`
+	Currency   string           `db:"currency" json:"currency"`
 	UpdatedAt  time.Time        `db:"updated_at" json:"-" sql:"DEFAULT:current_timestamp"`
 	CreatedAt  time.Time        `db:"updated_at" json:"-" sql:"DEFAULT:current_timestamp"`
 	OrderItems []OrderItemModel `gorm:"foreignKey:OrderId" json:"orderItems"`

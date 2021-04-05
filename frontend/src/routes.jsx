@@ -12,8 +12,6 @@ const NotFoundView = lazy(() => import("./views/errors/NotFoundView"));
 const BranchView = lazy(() => import("./views/Branch"));
 const TableView = lazy(() => import("./views/Table"));
 const TableDetailedView = lazy(() => import("./views/Table/Table"));
-const TableDashboard = lazy(() => import("./views/TableView"));
-
 const KitchenView = lazy(() => import("./views/Kitchen"));
 const KitchenDashboard = lazy(() => import("./views/KitchenView"));
 
@@ -57,7 +55,7 @@ const routes = (isLoggedIn) => [
       { path: "/", element: <Navigate to="/login" /> },
       { path: "login", element: <LoginView /> },
       { path: "register", element: <RegisterView /> },
-      { path: "table/:code", element: <TableDashboard /> },
+      { path: "table/:code", element: <TableDetailedView /> },
 
       { path: "404", element: <NotFoundView /> },
       { path: "*", element: <Navigate to="/404" /> },

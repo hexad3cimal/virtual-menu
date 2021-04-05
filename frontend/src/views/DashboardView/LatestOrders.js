@@ -35,6 +35,9 @@ const LatestOrders = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const orderState = useSelector((state) => state.order) || {};
+  const userState = useSelector((state) => state.user) || {};
+  const user = userState && userState.user || {};
+
   const orders = (orderState && orderState.orders) || [];
   const [openRowOrderId, setOpenRowOrderId] = React.useState({ id: null });
   const toggleOrderRow = (item) => {
@@ -117,7 +120,8 @@ const LatestOrders = () => {
                                     {item.productName}
                                   </TableCell>
                                   <TableCell>{item.quantity}</TableCell>
-                                  <TableCell>{item.price}</TableCell>
+                                  <TableCell>                                                     {user.config.currency} {item.price}
+                                  </TableCell>
                                   <TableCell>{item.status}</TableCell>
                                   <TableCell>
                                     <IconButton
@@ -169,7 +173,7 @@ const LatestOrders = () => {
                                                       {item.name}
                                                     </TableCell>
                                                     <TableCell align="right">
-                                                      {item.price}
+                                                      {user.config.currency} {item.price}
                                                     </TableCell>
                                                   </TableRow>
                                                 )
@@ -195,7 +199,9 @@ const LatestOrders = () => {
                         </Box>
                       </Collapse>
                     </TableCell>
-                    <TableCell>{order.price}</TableCell>
+                    <TableCell>
+                    {user.config.currency} {order.price}
+                    </TableCell>
                     <TableCell>
                       {moment(order.CreatedAt).format("DD/MM/YYYY")}
                     </TableCell>

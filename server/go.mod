@@ -3,6 +3,7 @@ module table-booking
 go 1.15
 
 require (
+	github.com/99designs/gqlgen v0.13.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -20,6 +21,9 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.5.1
 	github.com/twinj/uuid v1.0.0
+	github.com/urfave/cli v1.20.0 // indirect
+	github.com/vektah/gqlparser v1.2.0 // indirect
+	github.com/vektah/gqlparser/v2 v2.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect

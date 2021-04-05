@@ -47,9 +47,16 @@ func (ctrl OrderController) Add(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	timeZone, timeZoneErr := time.LoadLocation(tokenModel.TimeZone)
+	if timeZoneErr != nil {
+		logger.Error("user timezone not parsable "+tokenModel.UserId, timeZoneErr)
 
-	orderModel.ID = uuid.NewV4().String()
-	orderModel.CreatedAt = time.Now()
+		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+		c.Abort()
+		return
+	}
+
+	orderModel.CreatedAt = time.Now().In(timeZone).UTC()
 	orderModel.OrgId = tokenModel.OrgId
 	orderModel.BranchId = table.BranchId
 	orderModel.BranchName = table.BranchName
@@ -57,6 +64,8 @@ func (ctrl OrderController) Add(c *gin.Context) {
 	orderModel.Status = orderForm.Status
 	orderModel.Price = orderForm.Price
 	orderModel.Note = orderForm.Notes
+	orderModel.Currency = tokenModel.Currency
+	orderModel.ID = uuid.NewV4().String()
 
 	orderModel.RefCode = helpers.GetString()
 
@@ -71,8 +80,9 @@ func (ctrl OrderController) Add(c *gin.Context) {
 			customisationsArray = append(customisationsArray, customisation)
 		}
 		orderItemModel.ID = uuid.NewV4().String()
-		orderItemModel.CreatedAt = time.Now()
+		orderItemModel.CreatedAt = time.Now().In(timeZone).UTC()
 		orderItemModel.OrgId = tokenModel.OrgId
+		orderItemModel.Currency = tokenModel.Currency
 		orderItemModel.BranchId = table.BranchId
 		orderItemModel.BranchName = table.BranchName
 		orderItemModel.Status = orderForm.Status
@@ -83,7 +93,7 @@ func (ctrl OrderController) Add(c *gin.Context) {
 		orderItemModel.KitchenName = productMapper.KitchenName
 		orderItemModel.TableId = table.ID
 		orderItemModel.Customisations = customisationsArray
-		orderItemModel.Price = productMapper.Price
+		orderItemModel.Price = productMapper.Cost
 		orderItemsArray = append(orderItemsArray, orderItemModel)
 
 	}

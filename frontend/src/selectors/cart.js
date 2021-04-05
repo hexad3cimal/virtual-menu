@@ -4,14 +4,18 @@ const selectedProducts = state => state.order && state.order.selectedProducts ||
 let totalCost = 0;
 const itemsInCart = createSelector(
     selectedProducts,
-    (product) => product["items"]
-      .reduce((product1, product2) => product1.concat(product2), []) || []
-  )
+    products => (products.map(product => {
+      return product["items"] && product["items"]
+      .reduce((product1, product2) => product1.concat(product2), [])
+}
+  ).reduce((product1, product2) => product1.concat(product2), [])))
+
   const cost = createSelector(
     itemsInCart,
-    (product) => {
+    items => items.map(product=>{
+      totalCost =0;
         const productTotalPrice =
-          product.customisations.reduce(
+        product && product.customisations && product.customisations.reduce(
             (customisation1, customisation2) =>
               customisation1 + customisation2.price,
             0
@@ -21,10 +25,15 @@ const itemsInCart = createSelector(
         else {
           totalCost = totalCost + productTotalPrice;
         }
-    }
-  )
+       return totalCost
+      }
+  ))
   export const cartOutput = createSelector(
     itemsInCart,
     cost,
-    (items, cost) => ({ items , cost })
+    (items, cost) => ({ orderedProducts : items || [] , totalCost : cost.reduce(
+      (price1, price2) =>
+      price1 + price2,
+      0
+    )  || 0 })
   )

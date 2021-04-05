@@ -9,13 +9,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { store, persistor } from './store';
 
 import App from './App';
-// import Loader from './components/Loader';
-// import { register } from './serviceWorker';
+import Loader from './components/Loader';
 
 ReactDOM.render(
   <Provider store={store}>
-    {/* <PersistGate loading={<Loader />} persistor={persistor}> */}
-    <PersistGate persistor={persistor}>
+    <PersistGate loading={<Loader />} persistor={persistor}>
       <HelmetProvider>
         <BrowserRouter>
           <App />
@@ -29,7 +27,7 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.unregister();
+serviceWorkerRegistration.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

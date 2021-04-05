@@ -21,6 +21,7 @@ import CartItem from "./CartItem";
 import { addOrder, initiateOrderAdd } from "../../actions";
 import { Plus } from "react-feather";
 import { green, red } from "@material-ui/core/colors";
+import { cartOutput } from "../../selectors/cart";
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -91,29 +92,12 @@ const useStyles = makeStyles((theme) => ({
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const classes = useStyles();
   const orderState = useSelector((state) => state.order) || {};
   const tableState = useSelector((state) => state.table) || {};
   const selectedProducts = orderState.selectedProducts || [];
   const [cartClicked, setCartClicked] = useState(false);
-  const orderedProducts =
-    selectedProducts
-      .map((product) => product["items"])
-      .reduce((product1, product2) => product1.concat(product2), []) || [];
-  const classes = useStyles();
-  let totalCost = 0;
-  orderedProducts.forEach((product) => {
-    const productTotalPrice =
-      product.customisations.reduce(
-        (customisation1, customisation2) =>
-          customisation1 + customisation2.price,
-        0
-      ) + product.price;
-    if (product.quantity > 1)
-      totalCost = totalCost + productTotalPrice * product.quantity;
-    else {
-      totalCost = totalCost + productTotalPrice;
-    }
-  });
+  const  {orderedProducts,totalCost} = useSelector(cartOutput);
   const goBack = ()=>{
     dispatch(initiateOrderAdd(false))
   }
@@ -167,6 +151,7 @@ const Cart = () => {
                   }}
                 >
                   {orderedProducts.map((item, index) => {
+                    console.log("l",item)
                     return <CartItem key={item.id + index} item={item} />;
                   })}
                 </Card>
@@ -222,6 +207,7 @@ const Cart = () => {
         </Grid>
       );
     }
+  
 
     return (
       <Box

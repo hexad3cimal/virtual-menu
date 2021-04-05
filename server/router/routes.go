@@ -4,8 +4,12 @@ import (
 	"net/http"
 	"table-booking/config"
 	"table-booking/controllers"
+	"table-booking/graph"
+	"table-booking/graph/generated"
 	"table-booking/helpers"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -57,6 +61,24 @@ func isAdminMiddleware() gin.HandlerFunc {
 	}
 }
 
+func graphqlHandler() gin.HandlerFunc {
+
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+// Defining the Playground handler
+func playgroundHandler() gin.HandlerFunc {
+	h := playground.Handler("GraphQL", "/v1/api/query")
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
 func InitRouter() {
 
 	router := gin.Default()
@@ -68,9 +90,12 @@ func InitRouter() {
 
 	v1 := router.Group("/v1/api")
 	{
+
+		v1.POST("/query", graphqlHandler())
+		v1.GET("/play", playgroundHandler())
+
 		//user related routes
 		user := new(controllers.UserController)
-
 		v1.POST("/user/login", user.Login)
 		v1.POST("/user/register", user.Register)
 		v1.GET("/token/refresh", auth.Refresh)

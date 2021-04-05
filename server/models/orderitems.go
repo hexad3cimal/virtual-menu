@@ -19,6 +19,8 @@ type OrderItemModel struct {
 	KitchenName    string                `db:"kitchen_name" json:"kitchenName"`
 	Status         string                `db:"status" json:"status"`
 	Price          float32               `db:"price" json:"price"`
+	Cost           float32               `db:"cost" json:"cost"`
+	Currency       string                `db:"currency" json:"currency"`
 	Customisations []CustomisationsModel `gorm:"many2many:order_item_customisations;" json:"customisations"`
 	UpdatedAt      time.Time             `db:"updated_at" json:"updatedAt" sql:"DEFAULT:current_timestamp"`
 	CreatedAt      time.Time             `db:"created_at" json:"createdAt" sql:"DEFAULT:current_timestamp"`

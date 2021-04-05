@@ -1,0 +1,19 @@
+
+
+type User {
+  ID:                ID!       
+	Email:           String       
+	OrgId:              String       
+	BranchId:           String       
+	BranchName:         String       
+	RoleName:           String       
+	Address:            String      
+	Contact:            String       
+	LoginCode:          String       
+	FirstLogin:         Boolean         
+}
+
+
+type Query {
+  users: [User!]!
+}

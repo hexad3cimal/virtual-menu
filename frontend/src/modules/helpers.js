@@ -4,8 +4,14 @@
  * @module Helpers
  */
 import produce from 'immer';
+import {
+  useLocation
+} from "react-router-dom";
 import { request } from './client';
 
+export function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export const isFormValid = (errors) => {
   let bool = true;
@@ -71,3 +77,4 @@ export const remoteValidate = async (url) => {
     });
   return result;
 };
+

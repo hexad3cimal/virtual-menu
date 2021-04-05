@@ -26,7 +26,7 @@ func SetupRouter() *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
-		api := new(controllers.Api)
+		api := new(controllers.UserController)
 
 		v1.POST("/user/login", api.Login)
 		v1.POST("/user/register", api.Register)
@@ -56,7 +56,6 @@ func TestRegister(t *testing.T) {
 	registerForm.FullName = "testing"
 	registerForm.Email = testEmail
 	registerForm.Password = testPassword
-	registerForm.Org = true
 	data, _ := json.Marshal(registerForm)
 	req, err := http.NewRequest("POST", "/v1/user/register", bytes.NewBufferString(string(data)))
 	req.Header.Set("Content-Type", "application/json")
@@ -75,7 +74,6 @@ func main() {
 }
 
 var _ = Describe("Repository", func() {
-	var repository *Repository
 	var mock sqlmock.Sqlmock
 
 	BeforeEach(func() {
@@ -85,10 +83,9 @@ var _ = Describe("Repository", func() {
 		db, mock, err = sqlmock.New() // mock sql.DB
 		Expect(err).ShouldNot(HaveOccurred())
 
-		gdb, err := gorm.Open("postgres", db) // open gorm db
+		_, err = gorm.Open("postgres", db) // open gorm db
 		Expect(err).ShouldNot(HaveOccurred())
 
-		repository = &Repository{db: gdb}
 	})
 	AfterEach(func() {
 		err := mock.ExpectationsWereMet() // make sure all expectations were met

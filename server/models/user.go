@@ -191,3 +191,15 @@ func (u User) DeleteByBranchId(branchId string) (user UserModel, err error) {
 
 	return user, nil
 }
+
+func (u User) GetAllActiveUsers() (users []UserModel, err error) {
+	err = config.GetDB().Where("active=?", true).Find(&users).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return []UserModel{}, nil
+	}
+	if err != nil {
+		return []UserModel{}, err
+	}
+
+	return users, nil
+}

@@ -3,14 +3,15 @@
 package model
 
 type User struct {
-	ID         string  `json:"ID"`
-	Email      *string `json:"Email"`
-	OrgID      *string `json:"OrgId"`
-	BranchID   *string `json:"BranchId"`
-	BranchName *string `json:"BranchName"`
-	RoleName   *string `json:"RoleName"`
-	Address    *string `json:"Address"`
-	Contact    *string `json:"Contact"`
-	LoginCode  *string `json:"LoginCode"`
-	FirstLogin *bool   `json:"FirstLogin"`
+	ID         *string `json:"id"`
+	Name       *string `json:"name"`
+	Email      *string `json:"email"`
+	OrgID      *string `json:"orgId"`
+	BranchID   *string `json:"branchId"`
+	BranchName *string `json:"branchName"`
+	RoleName   *string `json:"roleName"`
+	Address    *string `json:"address"`
+	Contact    *string `json:"contact"`
+	LoginCode  *string `json:"loginCode"`
+	FirstLogin *bool   `json:"firstLogin"`
 }

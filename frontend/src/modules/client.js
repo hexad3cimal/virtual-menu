@@ -3,6 +3,7 @@
  * Client
  * @module Client
  */
+ import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 
 /**
@@ -80,3 +81,12 @@ export function request(url, options = {}){
     }
   });
 }
+
+
+export const graphQlClient = (url) => {
+  return new ApolloClient({
+    uri: url,
+    cache: new InMemoryCache()
+  });
+}
+

@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useState, memo } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import makeStyles from "@material-ui/styles/makeStyles";
 import Box from "@material-ui/core/Box";
@@ -20,16 +19,17 @@ import { Search as SearchIcon } from "react-feather";
 import { useDispatch } from "react-redux";
 import { deleteBranch, getBranches, hideAlert, initiateBranchAdd, setBranch } from "../../actions";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {overflowX:'scroll'},
 }));
 
-const Results = ({ branches }) => {
+const BranchList = memo(({ branches }) => {
   const classes = useStyles();
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const dispatch = useDispatch();
 
+  console.log("rendereee",branches)
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
@@ -127,10 +127,6 @@ const Results = ({ branches }) => {
       />
     </Card>
   );
-};
+});
 
-Results.propTypes = {
-  className: PropTypes.string,
-};
-
-export default Results;
+export default BranchList;

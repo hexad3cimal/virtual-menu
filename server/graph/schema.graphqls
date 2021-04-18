@@ -1,19 +1,20 @@
 
 
 type User {
-  ID:                ID!       
-	Email:           String       
-	OrgId:              String       
-	BranchId:           String       
-	BranchName:         String       
-	RoleName:           String       
-	Address:            String      
-	Contact:            String       
-	LoginCode:          String       
-	FirstLogin:         Boolean         
+  id:                ID   
+  name:               String  
+	email:           String       
+	orgId:              String       
+	branchId:           String       
+	branchName:         String       
+	roleName:           String       
+	address:            String      
+	contact:            String       
+	loginCode:          String       
+	firstLogin:         Boolean         
 }
 
 
 type Query {
-  users: [User!]!
+  users(loginCode: String): [User!]!
 }

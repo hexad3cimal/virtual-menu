@@ -43,7 +43,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Query struct {
-		Users func(childComplexity int) int
+		Users func(childComplexity int, loginCode *string) int
 	}
 
 	User struct {
@@ -55,13 +55,14 @@ type ComplexityRoot struct {
 		FirstLogin func(childComplexity int) int
 		ID         func(childComplexity int) int
 		LoginCode  func(childComplexity int) int
+		Name       func(childComplexity int) int
 		OrgID      func(childComplexity int) int
 		RoleName   func(childComplexity int) int
 	}
 }
 
 type QueryResolver interface {
-	Users(ctx context.Context) ([]*model.User, error)
+	Users(ctx context.Context, loginCode *string) ([]*model.User, error)
 }
 
 type executableSchema struct {
@@ -84,72 +85,84 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Users(childComplexity), true
+		args, err := ec.field_Query_users_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "User.Address":
+		return e.complexity.Query.Users(childComplexity, args["loginCode"].(*string)), true
+
+	case "User.address":
 		if e.complexity.User.Address == nil {
 			break
 		}
 
 		return e.complexity.User.Address(childComplexity), true
 
-	case "User.BranchId":
+	case "User.branchId":
 		if e.complexity.User.BranchID == nil {
 			break
 		}
 
 		return e.complexity.User.BranchID(childComplexity), true
 
-	case "User.BranchName":
+	case "User.branchName":
 		if e.complexity.User.BranchName == nil {
 			break
 		}
 
 		return e.complexity.User.BranchName(childComplexity), true
 
-	case "User.Contact":
+	case "User.contact":
 		if e.complexity.User.Contact == nil {
 			break
 		}
 
 		return e.complexity.User.Contact(childComplexity), true
 
-	case "User.Email":
+	case "User.email":
 		if e.complexity.User.Email == nil {
 			break
 		}
 
 		return e.complexity.User.Email(childComplexity), true
 
-	case "User.FirstLogin":
+	case "User.firstLogin":
 		if e.complexity.User.FirstLogin == nil {
 			break
 		}
 
 		return e.complexity.User.FirstLogin(childComplexity), true
 
-	case "User.ID":
+	case "User.id":
 		if e.complexity.User.ID == nil {
 			break
 		}
 
 		return e.complexity.User.ID(childComplexity), true
 
-	case "User.LoginCode":
+	case "User.loginCode":
 		if e.complexity.User.LoginCode == nil {
 			break
 		}
 
 		return e.complexity.User.LoginCode(childComplexity), true
 
-	case "User.OrgId":
+	case "User.name":
+		if e.complexity.User.Name == nil {
+			break
+		}
+
+		return e.complexity.User.Name(childComplexity), true
+
+	case "User.orgId":
 		if e.complexity.User.OrgID == nil {
 			break
 		}
 
 		return e.complexity.User.OrgID(childComplexity), true
 
-	case "User.RoleName":
+	case "User.roleName":
 		if e.complexity.User.RoleName == nil {
 			break
 		}
@@ -209,21 +222,22 @@ var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `
 
 type User {
-  ID:                ID!       
-	Email:           String       
-	OrgId:              String       
-	BranchId:           String       
-	BranchName:         String       
-	RoleName:           String       
-	Address:            String      
-	Contact:            String       
-	LoginCode:          String       
-	FirstLogin:         Boolean         
+  id:                ID   
+  name:               String  
+	email:           String       
+	orgId:              String       
+	branchId:           String       
+	branchName:         String       
+	roleName:           String       
+	address:            String      
+	contact:            String       
+	loginCode:          String       
+	firstLogin:         Boolean         
 }
 
 
 type Query {
-  users: [User!]!
+  users(loginCode: String): [User!]!
 }
 `, BuiltIn: false},
 }
@@ -245,6 +259,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["loginCode"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("loginCode"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["loginCode"] = arg0
 	return args, nil
 }
 
@@ -302,9 +331,16 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_users_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx)
+		return ec.resolvers.Query().Users(rctx, args["loginCode"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -392,7 +428,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_ID(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -417,17 +453,46 @@ func (ec *executionContext) _User_ID(ctx context.Context, field graphql.Collecte
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_Email(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -459,7 +524,7 @@ func (ec *executionContext) _User_Email(ctx context.Context, field graphql.Colle
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_OrgId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_orgId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -491,7 +556,7 @@ func (ec *executionContext) _User_OrgId(ctx context.Context, field graphql.Colle
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_BranchId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_branchId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -523,7 +588,7 @@ func (ec *executionContext) _User_BranchId(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_BranchName(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_branchName(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -555,7 +620,7 @@ func (ec *executionContext) _User_BranchName(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_RoleName(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_roleName(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -587,7 +652,7 @@ func (ec *executionContext) _User_RoleName(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_Address(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_address(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -619,7 +684,7 @@ func (ec *executionContext) _User_Address(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_Contact(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_contact(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -651,7 +716,7 @@ func (ec *executionContext) _User_Contact(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_LoginCode(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_loginCode(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -683,7 +748,7 @@ func (ec *executionContext) _User_LoginCode(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_FirstLogin(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_firstLogin(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1865,29 +1930,28 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
-		case "ID":
-			out.Values[i] = ec._User_ID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "Email":
-			out.Values[i] = ec._User_Email(ctx, field, obj)
-		case "OrgId":
-			out.Values[i] = ec._User_OrgId(ctx, field, obj)
-		case "BranchId":
-			out.Values[i] = ec._User_BranchId(ctx, field, obj)
-		case "BranchName":
-			out.Values[i] = ec._User_BranchName(ctx, field, obj)
-		case "RoleName":
-			out.Values[i] = ec._User_RoleName(ctx, field, obj)
-		case "Address":
-			out.Values[i] = ec._User_Address(ctx, field, obj)
-		case "Contact":
-			out.Values[i] = ec._User_Contact(ctx, field, obj)
-		case "LoginCode":
-			out.Values[i] = ec._User_LoginCode(ctx, field, obj)
-		case "FirstLogin":
-			out.Values[i] = ec._User_FirstLogin(ctx, field, obj)
+		case "id":
+			out.Values[i] = ec._User_id(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._User_name(ctx, field, obj)
+		case "email":
+			out.Values[i] = ec._User_email(ctx, field, obj)
+		case "orgId":
+			out.Values[i] = ec._User_orgId(ctx, field, obj)
+		case "branchId":
+			out.Values[i] = ec._User_branchId(ctx, field, obj)
+		case "branchName":
+			out.Values[i] = ec._User_branchName(ctx, field, obj)
+		case "roleName":
+			out.Values[i] = ec._User_roleName(ctx, field, obj)
+		case "address":
+			out.Values[i] = ec._User_address(ctx, field, obj)
+		case "contact":
+			out.Values[i] = ec._User_contact(ctx, field, obj)
+		case "loginCode":
+			out.Values[i] = ec._User_loginCode(ctx, field, obj)
+		case "firstLogin":
+			out.Values[i] = ec._User_firstLogin(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2151,21 +2215,6 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalID(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2487,6 +2536,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalID(*v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

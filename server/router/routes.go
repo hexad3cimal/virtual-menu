@@ -91,7 +91,7 @@ func InitRouter() {
 	v1 := router.Group("/v1/api")
 	{
 
-		v1.POST("/query", graphqlHandler())
+		v1.POST("/query", AuthMiddleware(), graphqlHandler())
 		v1.GET("/play", playgroundHandler())
 
 		//user related routes

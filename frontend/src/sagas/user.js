@@ -38,7 +38,7 @@ export function* login({ payload }) {
 }
 
 /**
- * Login
+ * Logout
  */
 export function* logout() {
   try {
@@ -58,6 +58,8 @@ export function* logout() {
     });
   }
 }
+
+
 
 /**
  * Register

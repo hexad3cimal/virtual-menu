@@ -6,8 +6,8 @@
 import { all, put, takeLatest } from "redux-saga/effects";
 
 import { ActionTypes } from "../constants/index";
-import { request } from "../modules/client";
-
+import { request, graphQlClient } from "../modules/client";
+import { gql } from '@apollo/client';
 /**
  * Add new table
  */
@@ -204,11 +204,45 @@ export function* deleteById({ payload }) {
 }
 
 /**
+ * Get by code
+ */
+ export function* getByLoginCode({ payload }) {
+  try {
+    const GET_USER = gql`
+     query users($loginCode : String){
+          users(loginCode: $loginCode){
+            id,
+            name,
+            branchName
+          }
+        }`;
+    const user = yield graphQlClient(`${window.restAppConfig.api}query`
+    ).query({
+      query: GET_USER,
+      variables: { loginCode : payload }
+  }).then( response => (response)).catch(error => {
+      throw error
+    });
+    yield put({
+      type: ActionTypes.TABLE_GET_BY_CODE_SUCCESS,
+      payload: user.data.users &&  user.data.users[0],
+    });
+  } catch (err) {
+    /* istanbul ignore next */
+    yield put({
+      type: ActionTypes.TABLE_GET_BY_CODE_FAILURE,
+      payload: err,
+    });
+  }
+}
+
+/**
  * Table Sagas
  */
 export default function* root() {
   yield all([
     takeLatest(ActionTypes.TABLE_ADD, addTable),
+    takeLatest(ActionTypes.TABLE_GET_BY_CODE, getByLoginCode),
     takeLatest(ActionTypes.EDIT_TABLE, editTable),
     takeLatest(ActionTypes.TABLE_GET, getTableById),
     takeLatest(ActionTypes.TABLES_GET, getTables),

@@ -21,6 +21,8 @@ type UserModel struct {
 	RoleId             string      `db:"role_id" json:"roleId"`
 	RoleName           string      `db:"role_name" json:"roleName"`
 	Address            string      `db:"name" json:"address"`
+	Latitude           string      `db:"latitude" json:"latitude"`
+	Longitude          string      `db:"longitude" json:"longitude"`
 	Contact            string      `db:"contact" json:"contact"`
 	Password           []byte      `db:"password" json:"-"`
 	ForgotPasswordCode string      `db:"forgot_password" json:"-"`

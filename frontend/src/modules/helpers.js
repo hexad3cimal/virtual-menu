@@ -78,3 +78,17 @@ export const remoteValidate = async (url) => {
   return result;
 };
 
+export const withinGeoSquare = (options) => {
+  return options.currentLatitude > (options.latitude - options.axis) && 
+    options.currentLatitude < (options.latitude + options.axis) &&
+    options.currentLongitude > (options.longitude - options.axis) &&
+    options.currentLongitude < (options.longitude + options.axis)
+  }
+
+export const getCurrentPosition = async () => {
+    if(navigator.geolocation){
+      return new Promise(function (resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+      });
+    }
+  }

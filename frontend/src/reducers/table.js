@@ -37,7 +37,7 @@ export default {
         draft.status = STATUS.ERROR;
         draft.error = payload;
       },
-      [ActionTypes.GEDIT_TABLE_SUCCESS]: (draft, { payload }) => {
+      [ActionTypes.EDIT_TABLE_SUCCESS]: (draft, { payload }) => {
         draft.status = STATUS.IDLE;
         draft.tables = [...draft.tables,...payload]
       },
@@ -70,6 +70,19 @@ export default {
         draft.new = false;
       },
       [ActionTypes.TABLE_GET_FAILURE]: (draft, { payload }) => {
+        draft.status = STATUS.ERROR;
+        draft.error = payload;
+        draft.new = false;
+      },
+      [ActionTypes.TABLE_GET_BY_CODE]: draft => {
+        draft.status = STATUS.RUNNING;
+      },
+      [ActionTypes.TABLE_GET_BY_CODE_SUCCESS]: (draft, { payload }) => {
+        draft.status = STATUS.READY;
+        draft.selectedTable = payload;
+        draft.new = false;
+      },
+      [ActionTypes.TABLE_GET_BY_CODE_FAILURE]: (draft, { payload }) => {
         draft.status = STATUS.ERROR;
         draft.error = payload;
         draft.new = false;

@@ -8,6 +8,8 @@ type BranchForm struct {
 	Currency   string `json:"currency" binding:"required"`
 	BranchId   string `json:"branchId"`
 	BranchName string `json:"branchName"`
+	Latitude   string `json:"latitude"`
+	Longitude  string `json:"longitude"`
 	Address    string `json:"address"`
 	Email      string `json:"email"`
 	Password   string `json:"newPassword"`

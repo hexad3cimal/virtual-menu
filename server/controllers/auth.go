@@ -15,6 +15,7 @@ func (ctl AuthController) IstokenValid(c *gin.Context) {
 
 		loggedInUser, getUserError := user.GetUserByLoginCode(loginCode)
 		if getUserError != nil {
+			logger.Error("invalid login code", loginCode)
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid login details"})
 			c.Abort()
 			return
@@ -47,19 +48,19 @@ func (ctl AuthController) IstokenValid(c *gin.Context) {
 	}
 	err := auth.TokenValid(c.Request, false)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("Invalid token", err)
 		if err.Error() == "token contains an invalid number of segments" {
 			AuthController.Refresh(AuthController{}, c)
 			return
 		}
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid authorization, please login again"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid"})
 		c.Abort()
 		return
 	}
 	tokenId, err := auth.ExtractTokenMetadata(c.Request, false)
 	if err != nil {
-		logger.Error(err)
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid authorization, please login again"})
+		logger.Error("Unable to extract token metadata", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid"})
 		c.Abort()
 		return
 	}

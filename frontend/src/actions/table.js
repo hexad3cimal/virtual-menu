@@ -11,6 +11,7 @@ export const {
   tablesGetBranch: getTablesOfBranch,
   editTable,
   tableDelete: deleteTable,
+  tableGetByCode: getTableByCode,
 } = createActions({
   [ActionTypes.TABLE_ADD_INITIATE]: payload => payload,
   [ActionTypes.TABLE_ADD]: payload => payload,
@@ -20,4 +21,5 @@ export const {
   [ActionTypes.TABLES_GET_BRANCH]: () => ({}),
   [ActionTypes.EDIT_TABLE]: payload => payload,
   [ActionTypes.TABLE_DELETE]: payload => payload,
+  [ActionTypes.TABLE_GET_BY_CODE]: payload => payload,
 });

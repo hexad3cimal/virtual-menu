@@ -52,6 +52,8 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		//get branch role for current organisation
 		roleModel, roleGetError := role.GetRoleByNameAndOrgId("manager", tokenModel.OrgId)
 		if roleGetError != nil {
+			logger.Error("Did not get valid manager role for org ", tokenModel.OrgId)
+
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -65,8 +67,9 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		userModel.Locked = false
 	} else {
 		var getUserError error
-		userModel, getUserError = user.GetUserById(tokenModel.ID)
+		userModel, getUserError = user.GetUserById(tokenModel.UserId)
 		if getUserError != nil {
+			logger.Error("Did not get valid user for ID ", tokenModel.UserId)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -82,6 +85,7 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		bytePassword := []byte(branchForm.Password)
 		hashedPassword, err := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
 		if err != nil {
+			logger.Error("Failed to hash password ", tokenModel.UserId)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -97,10 +101,13 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 	configModel.ID = uuid.NewV4().String()
 	configModel.Currency = branchForm.Currency
 	configModel.TimeZone = branchForm.Tz
+	configModel.UserId = userModel.ID
 	userModel.Config = configModel
 	branchUserModel, userError := user.Register(userModel)
 
 	if userError != nil {
+		logger.Error("Failed to add or update user ", tokenModel.UserId, userError)
+
 		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 		c.Abort()
 		return
@@ -111,6 +118,8 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		kitchenRoleModel, kitchenRoleGetError := role.GetRoleByNameAndOrgId("kitchen", tokenModel.OrgId)
 		if kitchenRoleGetError != nil {
 			user.DeleteById(userModel.ID)
+			logger.Error("Failed to get kitchen role ", tokenModel.UserId, kitchenRoleGetError)
+
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -127,6 +136,7 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		categoryModel.Name = "Non Veg"
 		_, addCategoryError = category.Add(categoryModel)
 		if addCategoryError != nil {
+			logger.Error("Failed to add category ", tokenModel.UserId, addCategoryError)
 			user.DeleteById(userModel.ID)
 			category.DeleteByBranchId(branchUserModel.BranchId)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
@@ -145,6 +155,8 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		userModel.ID = uuid.NewV4().String()
 		_, kitchenUserError := user.Register(userModel)
 		if kitchenUserError != nil {
+			logger.Error("Failed to add kitchen user ", tokenModel.UserId, kitchenUserError)
+
 			user.DeleteById(branchUserModel.ID)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
@@ -152,7 +164,7 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{"message": "success"})
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
 func (ctrl BranchController) Delete(c *gin.Context) {

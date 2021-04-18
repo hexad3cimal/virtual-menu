@@ -24,8 +24,10 @@ import Order from "./Order";
 import {
   getOrderByTableId,
   getProducts,
+  getTableByCode,
   initiateOrderAdd,
 } from "../../actions";
+import { useParams } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {width:'100%', display:'flex',flexDirection:'column'},
@@ -81,6 +83,9 @@ const TableView = () => {
   const tableState = useSelector((state) => state.table);
   const table = (tableState && tableState.selectedTable) || {};
   const orders = orderState.orders || [];
+  let { code } = useParams();
+  
+
   const activeOrders = orders
     .map((order) => {
       return order.orderItems;
@@ -94,6 +99,13 @@ const TableView = () => {
     if (openRowProductId === item.id) setOpenRowProductId(null);
     else setOpenRowProductId(item.id);
   };
+
+  useEffect(() => {
+    if (code) {
+      dispatch(getTableByCode(code));
+    }
+  }, [dispatch, code]);
+
   useEffect(() => {
     if (table.id) {
       dispatch(getOrderByTableId(table.id));

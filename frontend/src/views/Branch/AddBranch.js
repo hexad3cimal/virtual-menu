@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState }  from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -11,7 +11,7 @@ import TextField from '@material-ui/core/TextField';
 
 import { addBranch, getTimezones, hideAlert, getCurrencies, initiateBranchAdd, setBranch as setBranchInState } from '../../actions';
 import { Formik } from 'formik';
-import { remoteValidate } from '../../modules/helpers';
+import { getCurrentPosition, remoteValidate } from '../../modules/helpers';
 import Toast from '../../modules/toast';
 
 const AddBranch = () => {
@@ -20,46 +20,47 @@ const AddBranch = () => {
   const appState = useSelector((state) => state.app) || {};
   const branchState = useSelector((state) => state.branch) || {};
   const formErrors = useRef({});
-  const formValues = useRef({newPassword:''});
-  
-  const [branch,setBranch] = useState({
-    id:'',
+  const formValues = useRef({ newPassword: '' });
+  const [branch, setBranch] = useState({
+    id: '',
     name: '',
     address: '',
     newUserName: '',
     newPassword: '',
     passwordConfirm: '',
-    tz:'',
-    currency:'',
+    tz: '',
+    currency: '',
     email: '',
     contact: '',
-    edit: false
+    edit: false,
+    latitude: '',
+    longitude: ''
   })
 
   const passwordRegex = new RegExp(
     "^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{5,})"
   );
 
-    const selectedBranch = branchState.selectedBranch;
-    if(selectedBranch){
-     setBranch({...selectedBranch ,newUserName:selectedBranch.userName})
-    }else{
-      !branch.newUserName && setBranch({...branch ,newUserName:user.user.name.split(" ").join("")+"-"})
-    }
-    if(appState.tzs){
-      !branch.tz && setBranch({...branch ,tz:Intl.DateTimeFormat().resolvedOptions().timeZone})
+  const selectedBranch = branchState.selectedBranch;
+  if (selectedBranch && !branch.newUserName) {
+    setBranch({ ...branch, ...selectedBranch, newUserName: selectedBranch.userName })
+  } else {
+    !branch.newUserName && setBranch({ ...branch, newUserName: user.user.name.split(" ").join("") + "-" })
+  }
+  if (appState.tzs) {
+    !branch.tz && setBranch({ ...branch, tz: Intl.DateTimeFormat().resolvedOptions().timeZone })
   }
 
   if (appState.alert.show) {
     Toast({ message: appState.alert.message });
     dispatch(hideAlert());
   }
-  
 
-  useEffect(()=>{
+
+  useEffect(() => {
     dispatch(getTimezones())
     dispatch(getCurrencies())
-  },[])
+  }, [])
   const errorRules = {
     newUserName: {
       required: true,
@@ -101,22 +102,31 @@ const AddBranch = () => {
     },
   };
 
-  const back = ()=>{
+  const back = () => {
     dispatch(initiateBranchAdd(false))
     dispatch(setBranchInState(null))
   }
-  
+
+  const getLocation = () => {
+    getCurrentPosition().then(coords => {
+      setBranch({ ...branch, latitude: coords.coords.latitude.toString(), longitude: coords.coords.longitude.toString() })
+    }).catch(error => {
+      Toast({ message: error.message });
+      dispatch(hideAlert());
+    })
+  }
+
   const validate = async (values) => {
     const errors = {};
-    if(branch.id && !formValues.current.newPassword.length){
+    if (branch.id && !formValues.current.newPassword.length) {
       errorRules['newPassword'].required = false;
       errorRules['passwordConfirm'].required = false;
-    }else if(formValues.current.newPassword.length){
+    } else if (formValues.current.newPassword.length) {
       errorRules['newPassword'].required = true;
       errorRules['passwordConfirm'].required = true;
     }
     for (let value in errorRules) {
-      if(errorRules[value] && errorRules[value].required){
+      if (errorRules[value] && errorRules[value].required) {
         if (!values[value]) {
           errors[value] = errorRules[value]["errorMessages"]["required"];
         }
@@ -125,14 +135,14 @@ const AddBranch = () => {
             formValues.current[value] !== values[value] ||
             formErrors.current[value]
           ) {
-            
-              let url = `${errorRules[value].url}=${values[value]}`
-              if(branch.id){
-                url = `${url}&id=${branch.id}`
-              }
-              const result = await remoteValidate(
-                url
-              );
+
+            let url = `${errorRules[value].url}=${values[value]}`
+            if (branch.id) {
+              url = `${url}&id=${branch.id}`
+            }
+            const result = await remoteValidate(
+              url
+            );
             if (!result)
               errors[value] =
                 errorRules[value]["errorMessages"]["remoteValidate"];
@@ -147,20 +157,24 @@ const AddBranch = () => {
             errors[value] = errorRules[value]["errorMessages"]["compareWith"];
         }
       }
-   
+
     }
     formErrors.current = errors;
-    formValues.current = {...formValues.current,...values};
+    formValues.current = { ...formValues.current, ...values };
     return errors;
   };
 
   return (
     <Formik
-    enableReinitialize
-      initialValues={branch}
+      enableReinitialize
+      initialValues={
+        branch
+      }
       validate={validate}
-      onSubmit={(values,formik) => {
-        if(branch.id)values.edit=true
+      onSubmit={(values, formik) => {
+        if (branch.id) {
+          values.edit = true
+        }
         dispatch(addBranch(values));
         formik.setSubmitting(false);
       }}
@@ -170,7 +184,7 @@ const AddBranch = () => {
           onSubmit={handleSubmit}
         >
           <Card>
-            <CardHeader title={branch.id? "Edit branch" : "Add new branch"}/>
+            <CardHeader title={branch.id ? "Edit branch" : "Add new branch"} />
             <Divider />
             <CardContent>
               <Grid container spacing={3}>
@@ -205,18 +219,18 @@ const AddBranch = () => {
                 </Grid>
                 <Grid item md={6} xs={12}>
 
-                <TextField
-                  error={Boolean(touched.newUserName && errors.newUserName)}
-                  fullWidth
-                  helperText={touched.newUserName && errors.newUserName}
-                  label="Username"
-                  margin="normal"
-                  name="newUserName"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.newUserName}
-                  variant="outlined"
-                />
+                  <TextField
+                    error={Boolean(touched.newUserName && errors.newUserName)}
+                    fullWidth
+                    helperText={touched.newUserName && errors.newUserName}
+                    label="Username"
+                    margin="normal"
+                    name="newUserName"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.newUserName}
+                    variant="outlined"
+                  />
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
@@ -250,7 +264,7 @@ const AddBranch = () => {
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
-                    error={Boolean(values.newPassword  && errors.passwordConfirm)}
+                    error={Boolean(values.newPassword && errors.passwordConfirm)}
                     fullWidth
                     helperText={values.newPassword && errors.passwordConfirm}
                     label="Confirm Password"
@@ -276,7 +290,7 @@ const AddBranch = () => {
                     SelectProps={{ native: true }}
                     value={values.tz}
                     variant="outlined"
-                    shrink={values.tz}
+                    InputLabelProps={{ shrink: Boolean(values.tz) }}
                   >
                     <option key="" value=""></option>
                     {appState.tzs.map((tz) => (
@@ -299,11 +313,11 @@ const AddBranch = () => {
                     SelectProps={{ native: true }}
                     value={values.currency}
                     variant="outlined"
-                    shrink={values.currency}
+                    InputLabelProps={{ shrink: Boolean(values.tz) }}
                   >
                     <option key="" value=""></option>
-                    {appState.currencies.map((currency,index) => (
-                      <option key={currency.name+index} value={currency.symbol && currency.symbol.grapheme}>
+                    {appState.currencies.map((currency, index) => (
+                      <option key={currency.name + index} value={currency.symbol && currency.symbol.grapheme}>
                         {currency.name}
                       </option>
                     ))}
@@ -325,14 +339,62 @@ const AddBranch = () => {
                     rows={5}
                   />
                 </Grid>
+                <Grid item md={3} xs={12}>
+                  <TextField
+                    error={Boolean(touched.latitude && errors.latitude)}
+                    fullWidth
+                    helperText={touched.latitude && errors.latitude}
+                    label="Latitude"
+                    margin="normal"
+                    name="latitude"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.latitude}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <TextField
+                    error={Boolean(touched.longitude && errors.longitude)}
+                    fullWidth
+                    helperText={touched.longitude && errors.longitude}
+                    label="Longitude"
+                    margin="normal"
+                    name="longitude"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.longitude}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+
+                  <TextField
+                    error={Boolean(touched.width && errors.width)}
+                    fullWidth
+                    helperText={touched.width && errors.width}
+                    label="Approximate width"
+                    margin="normal"
+                    name="width"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.width}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <Button color="secondary" onClick={() => { getLocation() }} type="button" variant="contained">
+                    Get current location
+                  </Button>
+                </Grid>
               </Grid>
             </CardContent>
             <Divider />
             <Box display="flex" justifyContent="space-between" p={2}>
-            <Button color="secondary"  onClick={()=> {back()}} type="button" variant="contained">
+              <Button color="secondary" onClick={() => { back() }} type="button" variant="contained">
                 Go back
               </Button>
-              <Button color="primary" type="submit"  disabled={isSubmitting} variant="contained">
+              <Button color="primary" type="submit" disabled={isSubmitting} variant="contained">
                 {branch.id ? 'Update Branch' : 'Add Branch'}
               </Button>
             </Box>

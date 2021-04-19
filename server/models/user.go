@@ -38,7 +38,7 @@ type UserModel struct {
 	UpdatedAt          time.Time   `db:"updated_at"  gorm:"default:current_timestamp"`
 	CreatedAt          time.Time   `db:"created_at" json:"-" gorm:"default:current_timestamp"`
 	Role               RoleModel   `gorm:"foreignKey:roleID;references:id"`
-	Config             ConfigModel `gorm:"foreignKey:configID;references:id"`
+	Config             ConfigModel `gorm:"foreignKey:configID;references:id" json:"config"`
 }
 type User struct {
 }
@@ -119,7 +119,7 @@ func (u User) GetUserByLoginCode(code string) (user UserModel, err error) {
 }
 
 func (u User) GetUsersByBranchId(branchId string) (users []UserModel, err error) {
-	err = config.GetDB().Where("branch_id=?", branchId).Where("active=?", true).Find(&users).Error
+	err = config.GetDB().Where("branch_id=?", branchId).Where("active=?", true).Preload("Config").Find(&users).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return []UserModel{}, nil
 	}
@@ -131,7 +131,7 @@ func (u User) GetUsersByBranchId(branchId string) (users []UserModel, err error)
 }
 
 func (u User) GetUsersByOrgIdAndRoleName(orgId string, roleName string) (users []UserModel, err error) {
-	err = config.GetDB().Where("org_id=?", orgId).Where("role_name=?", roleName).Where("active=?", true).Find(&users).Error
+	err = config.GetDB().Where("org_id=?", orgId).Where("role_name=?", roleName).Where("active=?", true).Preload("Config").Find(&users).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return []UserModel{}, nil
 	}
@@ -143,7 +143,7 @@ func (u User) GetUsersByOrgIdAndRoleName(orgId string, roleName string) (users [
 }
 
 func (u User) GetUsersByOrgIdAndRoleId(orgId string, roleId string) (users []UserModel, err error) {
-	err = config.GetDB().Where("org_id=?", orgId).Where("role_id=?", roleId).Where("active=?", true).Find(&users).Error
+	err = config.GetDB().Where("org_id=?", orgId).Where("role_id=?", roleId).Where("active=?", true).Preload("Config").Find(&users).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return []UserModel{}, nil
 	}
@@ -155,7 +155,7 @@ func (u User) GetUsersByOrgIdAndRoleId(orgId string, roleId string) (users []Use
 }
 
 func (u User) GetUsersByBranchIdAndRoleId(branchId string, roleId string) (users []UserModel, err error) {
-	err = config.GetDB().Where("branch_id=?", branchId).Where("role_id=?", roleId).Where("active=?", true).Find(&users).Error
+	err = config.GetDB().Where("branch_id=?", branchId).Where("role_id=?", roleId).Where("active=?", true).Preload("Config").Find(&users).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return []UserModel{}, nil
 	}
@@ -166,7 +166,7 @@ func (u User) GetUsersByBranchIdAndRoleId(branchId string, roleId string) (users
 	return users, nil
 }
 func (u User) GetUsersByBranchIdAndRoleName(branchId string, roleName string) (users []UserModel, err error) {
-	err = config.GetDB().Where("branch_id=?", branchId).Where("role_name=?", roleName).Where("active=?", true).Find(&users).Error
+	err = config.GetDB().Where("branch_id=?", branchId).Where("role_name=?", roleName).Where("active=?", true).Preload("Config").Find(&users).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return []UserModel{}, nil
 	}

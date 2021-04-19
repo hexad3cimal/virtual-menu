@@ -62,14 +62,46 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		//add new user with branch role
 		userModel.RoleId = roleModel.ID
 		userModel.RoleName = roleModel.Name
-
+		configModel.ID = uuid.NewV4().String()
 		userModel.Active = true
 		userModel.Locked = false
 	} else {
 		var getUserError error
+		var getConfigError error
+
 		userModel, getUserError = user.GetUserById(tokenModel.UserId)
 		if getUserError != nil {
 			logger.Error("Did not get valid user for ID ", tokenModel.UserId)
+			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+			c.Abort()
+			return
+		}
+		if helpers.AdminOrManagerOfTheOrgAndBranch(tokenModel.UserId, branchForm.OrgId, branchForm.BranchId) {
+			if helpers.IsAdmin(tokenModel.ID) {
+				loggedInUser, getLoggedInUserError := user.GetUserById(tokenModel.UserId)
+				if getLoggedInUserError != nil {
+					logger.Error("Did not get valid user for ID ", tokenModel.UserId)
+					c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+					c.Abort()
+					return
+				}
+				if loggedInUser.OrgId != branchForm.OrgId {
+					logger.Error("Admin Not authorized for edititng branch ", tokenModel.UserId)
+					c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+					c.Abort()
+					return
+				}
+			} else {
+				logger.Error("Admin Not authorized for edititng branch ", tokenModel.UserId)
+				c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+				c.Abort()
+				return
+			}
+		}
+
+		configModel, getConfigError = configService.GetByUserId(branchForm.Id)
+		if getConfigError != nil {
+			logger.Error("Did not get valid config for user ID ", tokenModel.UserId)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -98,7 +130,6 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 
 	userModel.Email = branchForm.Email
 
-	configModel.ID = uuid.NewV4().String()
 	configModel.Currency = branchForm.Currency
 	configModel.TimeZone = branchForm.Tz
 	configModel.UserId = userModel.ID
@@ -153,7 +184,13 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		userModel.ForgotPasswordCode = uuid.NewV4().String()
 		userModel.BranchId = branchUserModel.BranchId
 		userModel.ID = uuid.NewV4().String()
+		configModel.ID = uuid.NewV4().String()
+		configModel.Currency = branchForm.Currency
+		configModel.TimeZone = branchForm.Tz
+		configModel.UserId = userModel.ID
+		userModel.Config = configModel
 		_, kitchenUserError := user.Register(userModel)
+
 		if kitchenUserError != nil {
 			logger.Error("Failed to add kitchen user ", tokenModel.UserId, kitchenUserError)
 

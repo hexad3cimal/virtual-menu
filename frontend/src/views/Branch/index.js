@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import makeStyles from "@material-ui/styles/makeStyles";
 import  Box from "@material-ui/core/Box";
 import  Button from "@material-ui/core/Button";
@@ -13,6 +13,7 @@ import BranchList from "./BranchList";
 import { getBranches, hideAlert, initiateBranchAdd, setBranch } from "../../actions";
 import AddBranch from "./AddBranch";
 import Toast from "../../modules/toast";
+import { branches } from "../../selectors/branch";
 const useStyles = makeStyles((theme) => ({
   root: {
     minHeight: "100vh",
@@ -26,9 +27,7 @@ const Branch = () => {
   const dispatch = useDispatch();
   const appState = useSelector((state) => state.app);
   const branchState = useSelector((state) => state.branch);
-  const branches = branchState && branchState.branches;
-  const memoizedBranches = useMemo(()=> (branches),[branches]);
-
+  const branchesInState = useSelector(branches);
   const userState = useSelector(state => state.user) || {}
 
   if (appState.alert.show) {
@@ -55,12 +54,12 @@ const Branch = () => {
           </Box>
         ) : (
           <Grid container mt={3}>
-            {branches.length && userState.user.role === 'admin' ? (
+            {branchesInState.length && userState.user.role === 'admin' ? (
               <Grid item md={12} xs={12}>
-                <BranchList branches={memoizedBranches} />
+                <BranchList branches={branchesInState} />
               </Grid>
             ) : <div></div>}
-            {!branches.length && userState.user.role === 'admin' ? (<Typography style={{ margin: '1rem' }} variant="h4">No branches added yet please <Button onClick={() => dispatch(initiateBranchAdd(true))} color="primary" variant="contained">
+            {!branchesInState.length && userState.user.role === 'admin' ? (<Typography style={{ margin: '1rem' }} variant="h4">No branches added yet please <Button onClick={() => dispatch(initiateBranchAdd(true))} color="primary" variant="contained">
               Add branch
           </Button></Typography>) : <div></div>}
           </Grid>

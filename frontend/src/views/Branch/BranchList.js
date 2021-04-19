@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import makeStyles from "@material-ui/styles/makeStyles";
 import Box from "@material-ui/core/Box";
@@ -23,13 +23,14 @@ const useStyles = makeStyles(() => ({
   root: {overflowX:'scroll'},
 }));
 
-const BranchList = memo(({ branches }) => {
+const BranchList = (props) => {
+  const {branches} = props
+  console.log(props)
   const classes = useStyles();
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const dispatch = useDispatch();
 
-  console.log("rendereee",branches)
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
@@ -46,7 +47,6 @@ const BranchList = memo(({ branches }) => {
     setTimeout(()=>{dispatch(hideAlert())},100)
     dispatch(getBranches())
   };
-
 
   return (
     <Card className={classes.root}>
@@ -127,6 +127,6 @@ const BranchList = memo(({ branches }) => {
       />
     </Card>
   );
-});
+};
 
 export default BranchList;

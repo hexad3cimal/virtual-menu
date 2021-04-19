@@ -43,7 +43,7 @@ const AddBranch = () => {
 
   const selectedBranch = branchState.selectedBranch;
   if (selectedBranch && !branch.newUserName) {
-    setBranch({ ...branch, ...selectedBranch, newUserName: selectedBranch.userName })
+    setBranch({ ...branch, ...selectedBranch, newUserName: selectedBranch.userName,tz: selectedBranch.config.timeZone, currency: selectedBranch.config.currency })
   } else {
     !branch.newUserName && setBranch({ ...branch, newUserName: user.user.name.split(" ").join("") + "-" })
   }

@@ -44,6 +44,13 @@ func (configStruct Config) DeleteById(id string) (returnModel ConfigModel, err e
 	return returnModel, err
 }
 
+func (configStruct Config) GetByUserId(id string) (returnModel ConfigModel, err error) {
+
+	err = config.GetDB().Where("user_id=?", id).First(&returnModel).Error
+
+	return returnModel, err
+}
+
 func (configStruct Config) GetConfigByOrgId(orgId string) (configModel ConfigModel, err error) {
 
 	err = config.GetDB().Where("org_id=?", orgId).First(&configModel).Error

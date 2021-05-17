@@ -10,6 +10,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -83,6 +84,7 @@ func InitRouter() {
 
 	router := gin.Default()
 	router.Use(CORS())
+	router.Use(helmet.Default())
 	router.Use(generateContextId())
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 

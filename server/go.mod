@@ -6,6 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.13.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
+	github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/gzip v0.0.2
 	github.com/gin-gonic/contrib v0.0.0-20201005132743-ca038bbf2944

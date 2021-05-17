@@ -61,6 +61,12 @@ func (configStruct Config) GetConfigByOrgId(orgId string) (configModel ConfigMod
 
 	return configModel, err
 }
+
+func (configStruct Config) GetConfigByBranchId(branchId string) (configModel ConfigModel, err error) {
+
+	err = config.GetDB().Where("branch_id=?", branchId).First(&configModel).Error
+	return configModel, err
+}
 func (configStruct Config) GetCurrencies() (currencies interface{}, err error) {
 
 	filepath, _ := filepath.Abs("../server/config/currency.json")

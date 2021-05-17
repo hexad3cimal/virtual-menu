@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { login, hideAlert } from '../../actions';
 import Toast from '../../modules/toast';
 import {isFormValid} from '../../modules/helpers';
-
+import bg from '../../assets/images/bg.webp'
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
@@ -30,10 +30,11 @@ const useStyles = makeStyles(theme => ({
   },
   homeBox: {
     height: '100%',
-    backgroundImage: `url('/images/bg.png')`,
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'contain',
-    margin: theme.spacing(6)
+    margin: theme.spacing(6),
+  },
+  bgImage: {
+    width: '30rem',
+    height:'22rem'
   },
   loginBox: {
     height: '100%',
@@ -75,10 +76,11 @@ const LoginView = () => {
     }
 
   return (
-    <Page className={classes.root} title="Login">
+    <Page className={classes.root} title="Order food now!">
       <Box className={classes.box}>
         <Container className={classes.box}>
         <Grid item md={12} xs={false} className={classes.homeBox}>
+          <img src={bg} className={classes.bgImage} />
         </Grid>
         <Grid className={classes.loginBox} item md={12} xs={12}>
           <Formik

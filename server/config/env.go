@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -22,6 +23,7 @@ type Uploads struct {
 }
 type Configuration struct {
 	Port    string
+	Ui      string
 	Db      Db
 	Secret  string
 	Uploads Uploads
@@ -32,7 +34,12 @@ func InitConfig() {
 
 	viper.AddConfigPath("./env")
 	viper.SetConfigType("yml")
-	viper.SetConfigName("dev")
+	envName, exists := os.LookupEnv("APP_ENV")
+	if !exists {
+		envName = "dev"
+	}
+
+	viper.SetConfigName(envName)
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()

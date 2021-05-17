@@ -32,6 +32,7 @@ func (ctrl TableController) AddOrEdit(c *gin.Context) {
 		return
 	}
 	if !helpers.AdminOrManagerOfTheOrgAndBranch(tokenModel.UserId, tokenModel.OrgId, tokenModel.BranchId) {
+		logger.Error("unauthorized access type TABLEADD by ", tokenModel.UserId)
 		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 		c.Abort()
 		return
@@ -41,6 +42,7 @@ func (ctrl TableController) AddOrEdit(c *gin.Context) {
 		//get branch role for current organisation
 		roleModel, roleGetError := role.GetRoleByNameAndOrgId("table", tokenModel.OrgId)
 		if roleGetError != nil || tableForm.Password == "" {
+			logger.Error("get table role error for org ", roleGetError, tokenModel.OrgId)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -56,6 +58,7 @@ func (ctrl TableController) AddOrEdit(c *gin.Context) {
 	} else {
 		userModel, userGetError = user.GetUserById(tableForm.ID)
 		if userGetError != nil {
+			logger.Error("get table error for ID ", userGetError, tableForm.ID)
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -68,6 +71,8 @@ func (ctrl TableController) AddOrEdit(c *gin.Context) {
 		bytePassword := []byte(tableForm.Password)
 		hashedPassword, err := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
 		if err != nil {
+			logger.Error("error while generating hashed password ", err)
+
 			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 			c.Abort()
 			return
@@ -78,9 +83,10 @@ func (ctrl TableController) AddOrEdit(c *gin.Context) {
 	userModel.Name = tableForm.TableName
 	userModel.UserName = tableForm.UserName
 	userModel.UserNameLowerCase = strings.ToLower(userModel.UserName)
-	config, getConfigError := configService.GetConfigByOrgId(tokenModel.BranchId)
+	config, getConfigError := configService.GetConfigByBranchId(tokenModel.BranchId)
 
 	if getConfigError != nil {
+		logger.Error("error while getting config for branchId ", tokenModel.BranchId, getConfigError)
 		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 		c.Abort()
 		return
@@ -88,6 +94,8 @@ func (ctrl TableController) AddOrEdit(c *gin.Context) {
 	userModel.Config = config
 	_, userError := user.Register(userModel)
 	if userError != nil {
+		logger.Error("error creating or updating table ", userError)
+
 		user.DeleteById(userModel.ID)
 		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
 		c.Abort()

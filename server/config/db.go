@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	_ "github.com/lib/pq"
 
 	"github.com/jinzhu/gorm"
@@ -10,7 +12,9 @@ var DB *gorm.DB
 var log = InitLogger()
 
 func InitDB() {
-	db, err := gorm.Open("postgres", "host="+GetConfig().Db.Host+" port="+GetConfig().Db.Port+" user="+GetConfig().Db.UserName+" dbname="+GetConfig().Db.Name+" password="+GetConfig().Db.Password)
+	dbString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		GetConfig().Db.Host, GetConfig().Db.Port, GetConfig().Db.UserName, GetConfig().Db.Password, GetConfig().Db.Name)
+	db, err := gorm.Open("postgres", dbString)
 	if err != nil {
 		panic(err)
 	}

@@ -29,7 +29,6 @@ func (ctrl UserController) Logout(c *gin.Context) {
 }
 
 func (ctrl UserController) Login(c *gin.Context) {
-	logger.Info("login")
 	var loginForm mappers.LoginForm
 
 	if c.ShouldBindJSON(&loginForm) != nil {

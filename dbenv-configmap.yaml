@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: table_manager
+  POSTGRES_PASSWORD: root
+  POSTGRES_USER: postgres
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: database-dbenv
+  name: dbenv

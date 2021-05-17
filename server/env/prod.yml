@@ -1,0 +1,12 @@
+port: 8090
+db: 
+    host: 'database'
+    port: 5432
+    name: 'table_manager'
+    username: 'postgres'
+    password: 'root'
+secret: 123e4567#e89b&12d3*a4562426614174000
+ui: ./ui/
+uploads:
+    base: ../frontend/build
+    products: /images/products/

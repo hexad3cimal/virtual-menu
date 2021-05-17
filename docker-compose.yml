@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  database:
+    image: postgres
+    restart: always
+    env_file:
+      - .dbenv
+    ports:
+      - "5436:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+  server:
+    image: jovin.jfrog.io/noserver/noserver
+    depends_on:
+      - database
+    networks:
+      - default
+    ports:
+    - "8090:8090"
+    environment:
+     - APP_ENV=prod
+volumes:
+  data:

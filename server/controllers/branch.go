@@ -201,6 +201,34 @@ func (ctrl BranchController) AddOrEdit(c *gin.Context) {
 		}
 	}
 
+	orgUser, getOrgUserError := user.GetAdmin(branchUserModel.OrgId)
+
+	if getOrgUserError != nil {
+		logger.Error("Failed to update org user ", branchUserModel.OrgId, getOrgUserError)
+
+		user.DeleteById(branchUserModel.ID)
+		user.DeleteById(userModel.ID)
+
+		c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+		c.Abort()
+		return
+	}
+
+	if !orgUser.BranchCreated {
+		orgUser.BranchCreated = true
+		_, updateUserError := user.Register(orgUser)
+
+		if updateUserError != nil {
+			logger.Error("Failed to update org user branch status ", branchUserModel.OrgId, updateUserError)
+
+			user.DeleteById(branchUserModel.ID)
+			user.DeleteById(userModel.ID)
+
+			c.JSON(http.StatusExpectationFailed, gin.H{"message": "error"})
+			c.Abort()
+			return
+		}
+	}
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 

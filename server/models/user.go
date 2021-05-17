@@ -31,6 +31,7 @@ type UserModel struct {
 	ConfigId           string      `db:"config_id" json:"configId"`
 	Locked             bool        `db:"locked" json:"-" gorm:"default:false"`
 	FirstLogin         bool        `db:"first_login" json:"firstLogin" gorm:"default:true"`
+	BranchCreated      bool        `db:"branch_created" json:"branchCreated" gorm:"default:false"`
 	LockedUntil        time.Time   `db:"locked_until" json:"-"`
 	Name               string      `db:"name" json:"name"`
 	UserName           string      `db:"user_name" json:"userName"`
@@ -142,6 +143,11 @@ func (u User) GetUsersByOrgIdAndRoleName(orgId string, roleName string) (users [
 	return users, nil
 }
 
+func (u User) GetAdmin(orgId string) (user UserModel, err error) {
+	err = config.GetDB().Where("org_id=?", orgId).Where("role_name=?", "admin").Where("active=?", true).Preload("Config").First(&user).Error
+
+	return user, nil
+}
 func (u User) GetUsersByOrgIdAndRoleId(orgId string, roleId string) (users []UserModel, err error) {
 	err = config.GetDB().Where("org_id=?", orgId).Where("role_id=?", roleId).Where("active=?", true).Preload("Config").Find(&users).Error
 	if gorm.IsRecordNotFoundError(err) {
